@@ -1,0 +1,43 @@
+#include<ESP8266WiFi.h>
+#include<WiFiClient.h>
+#include<ESP8266HTTPClient.h>
+
+WiFiClient client;
+HTTPClient http;
+void connectToWifi(void);
+
+void setup() {
+ Serial.begin(9600);
+ connectToWifi();
+}
+int httpcode;
+void loop() {
+  http.begin(client,"http://api.thingspeak.com/update?api_key=JP313EUO616HJLN2&field1=160");
+  Serial.println("waiting for response");
+  httpcode = http.GET();
+  if(httpcode > 0){
+    Serial.println("data sent successfully");
+  }else{
+    Serial.println("error in sending");
+  }
+
+  http.end();
+  delay(16000);
+}
+
+void connectToWifi(){
+  
+  WiFi.mode(WIFI_STA);
+  WiFi.begin("CANALBOX-97AC-2G","RQ9t7Y2Uak");
+  Serial.print("connecting to wifi");
+
+  while(WiFi.status() != WL_CONNECTED){
+    Serial.print(".");
+    delay(200);
+  }
+
+  Serial.print("IP Address:");
+  Serial.println("WiFi.localIP");
+  Serial.print("MacAddress:");
+  Serial.println(WiFi.macAddress());
+}
