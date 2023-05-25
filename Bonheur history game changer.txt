@@ -1,0 +1,106 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+
+// Replace with your network credentials
+const char* ssid = "CANALBOX-97AC-2G";
+const char* password = "RQ9t7Y2Uak";
+
+// Replace with the URL of your PHP script
+const char* serverUrl = "http://prototypeathingenuity.000webhostapp.com/write_data.php";
+
+void setup() {
+  Serial.begin(9600);
+
+  // Connect to Wi-Fi network
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("Wi-Fi connected");
+
+  // Send data to server
+  sendData("Hello, World!");
+}
+
+void loop() {
+}
+
+void sendData(String data) {
+  HTTPClient http;
+
+  // Connect to server
+  WiFiClient client;
+  http.begin(client, serverUrl);
+
+  // Set headers and data for HTTP POST request
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  int httpResponseCode = http.POST("data=" + data);
+
+  // Check for successful HTTP POST request
+  if (httpResponseCode > 0) {
+    Serial.print("HTTP Response code: ");
+    Serial.println(httpResponseCode);
+  } else {
+    Serial.print("Error code: ");
+    Serial.println(httpResponseCode);
+  }
+
+  http.end();
+}
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------------
+//write_data.php
+
+
+<?php
+
+
+
+
+
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Specify the file name and path to write the data
+$filename = "written_sample_1.txt";
+
+// Open the file in append mode
+$file = fopen($filename, "a");
+
+// Write the data to the file
+fwrite($file, "hello world of crazzy");
+
+// Close the file
+fclose($file);
+
+// Return a success response to the NodeMCU
+echo "Data received and written to file successfully";
+    
+    
+    
+    
+    
+    
+//     // Get the data from the NodeMCU
+//     $data = $_POST['data'];
+//       $file = fopen("data_bbx.txt", "w");
+//   fwrite($file, "data: $data");
+//     fclose($file);
+ 
+}
+
+/* i eventiuary reached this after atleast 4 days running after it!*/
+
+?>
+
+
+
