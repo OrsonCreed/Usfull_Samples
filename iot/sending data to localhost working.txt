@@ -1,0 +1,64 @@
+#include <ESP8266HTTPClient.h>
+#include <ESP8266WiFi.h>
+
+String URL = "http://192.168.0.101/iot_sandbox/1.php";
+
+const char* ssid = "MUMARAGISHYIKA_2.4";
+const char* password = "!khris@Wi_Fi_2.4!";
+
+int a = 200;
+
+// Function prototype
+void connectWiFi();
+
+void setup() {
+  Serial.begin(9600);
+  connectWiFi();
+}
+
+void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    connectWiFi();
+  }
+
+  // Convert integer to String
+  String postData = "test_value=" + String(a);
+  
+  HTTPClient http;
+  WiFiClient client;
+  
+  http.begin(client, URL);
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded"); // Add content-type header
+  
+  int httpcode = http.POST(postData);
+  String payload = http.getString();
+  
+  Serial.print("HTTP Response Code: ");
+  Serial.println(httpcode); // Print HTTP response code
+  
+  Serial.print("Server Response: ");
+  Serial.println(payload); // Print server response
+  
+  http.end();
+  
+  delay(3000);
+}
+
+void connectWiFi(){
+  WiFi.mode(WIFI_OFF);
+  delay(1000);
+
+  WiFi.mode(WIFI_STA);
+
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting to WiFi");
+
+  while(WiFi.status() != WL_CONNECTED){
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.print("Connected to: ");
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+}
